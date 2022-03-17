@@ -4,17 +4,18 @@ import {
   Get,
   HttpStatus,
   Post,
+  Put,
   Req,
   Res,
 } from '@nestjs/common';
 import { AppService } from '../app.service';
 import { Request, Response } from 'express';
 // import { notes } from './../notes/notes';
-import { isNull } from 'util';
+
 import { Note } from './../notes/notes';
 @Controller('notes')
 export class NotesController {
-  constructor(private readonly appService: AppService) {}
+  constructor(private readonly appService: AppService) { }
 
   @Get()
   getHello(): Object {
@@ -22,8 +23,9 @@ export class NotesController {
     return this.appService.notesArray;
   }
 
-  @Post('add')
+  @Post()
   addNote(@Req() req: Request): Object {
+    console.log('post entre')
     console.log(req.params);
     if (req.body != null) {
       var objAux: Note = {
@@ -38,11 +40,11 @@ export class NotesController {
     console.log(this.appService.notesArray);
     return objAux;
   }
-  @Get('getOne/:id')
+  @Get(':id')
   getNote(@Req() req: Request, @Res() res: Response): Object {
     try {
       let id = Number(req.params.id);
-      if (isNaN(id) || !isNull(id)) {
+      if (id != null) {
         const note = this.appService.notesArray.find((not) => not.id === id);
         if (note != null) {
           res.status(HttpStatus.OK).json(note);
@@ -64,24 +66,27 @@ export class NotesController {
       return error.message;
     }
   }
-  @Delete('/:id')
-  deleteNote(@Req() req: Request, @Res() res: Response): Object {
+  @Delete(':id')
+  deleteNote(@Req() req: Request, @Res() res: Response) {
     try {
       let id = Number(req.params.id);
-      console.log(this.appService.notesArray);
 
       console.log(id);
       if (id != null || id != NaN) {
-        this.appService.notesArray = this.appService.notesArray.filter(
+        var result = this.appService.notesArray.filter(
           (not) => {
-            console.log(not);
+            // console.log(not);
+
 
             return not.id !== id;
           },
         );
 
         console.log(this.appService.notesArray);
-        if (this.appService.notesArray != null) {
+
+        if (JSON.stringify(this.appService.notesArray) != JSON.stringify(result)) { //si son distintos significa que el result elimino el id que buscaba, si son iguales es por que no elimino nada
+
+          this.appService.notesArray = result;
           res.json(this.appService.notesArray);
         } else {
           let objError = {
@@ -101,6 +106,40 @@ export class NotesController {
       res.status(400).json(error.message);
     }
     // console.log(res);
-    return {};
+  }
+  @Put(':id')
+  putImportance(@Req() req: Request, @Res() res: Response) {
+    try {
+      let id = Number(req.params.id);
+
+      console.log(id);
+      if (id != null || id != NaN) {
+        var result = this.appService.notesArray.filter((not) => not.id === id);
+        if (result.length > 0 && result != null) {
+          const changedNote = { ...result[0], important: !result[0].important };
+          // console.log(changedNote);
+
+          this.appService.notesArray = this.appService.notesArray.map((note) => (note.id !== id ? note : changedNote));
+
+          res.send(changedNote);
+        } else {
+          let objError = {
+            message: "Error, no se encuentra el recurso",
+            status: 400
+          };
+          res.status(400).json(objError);
+        }
+      }
+      else {
+        let objError = {
+          message: 'El ID proporcionado no es correcto.',
+          status: 400,
+        };
+        res.status(400).json(objError);
+      }
+    } catch (error) {
+      res.status(400).json(error.message);
+
+    }
   }
 }
