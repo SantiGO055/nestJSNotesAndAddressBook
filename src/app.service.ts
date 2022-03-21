@@ -13,6 +13,7 @@ export class AppService {
   notFoundController(): string {
     return 'Not Found';
   }
+
   addNotesArray(note: Note[]): Note[] {
     this.notesArray = note;
     return this.notesArray;

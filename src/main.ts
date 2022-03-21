@@ -10,13 +10,14 @@ async function bootstrap() {
 
   const service = app.get(AppService);
   /** add mock notes */
-  service.addNotesArray(notes)
+  service.addNotesArray(notes);
 
   app.enableCors();
-  await app.listen(3001);
+  await app.listen(3030);
   if (module.hot) {
     module.hot.accept();
     module.hot.dispose(() => app.close());
   }
 }
+
 bootstrap();
