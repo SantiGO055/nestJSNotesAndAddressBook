@@ -1,3 +1,3 @@
-var password = 'santidatabase';
-var username = 'santigo';
+var password = '';
+var username = '';
 export default { password, username };
