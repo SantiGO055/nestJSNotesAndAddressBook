@@ -75,9 +75,6 @@ export class NotesController {
       if (id != null || id != NaN) {
         var result = this.appService.notesArray.filter(
           (not) => {
-            // console.log(not);
-
-
             return not.id !== id;
           },
         );
