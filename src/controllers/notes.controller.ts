@@ -121,6 +121,9 @@ export class NotesController {
 
           this.appService.notesArray = this.appService.notesArray.map((note) => (note.id !== id ? note : changedNote));
 
+          console.log("array")
+          console.log(this.appService.notesArray)
+
           res.send(changedNote);
         } else {
           let objError = {
